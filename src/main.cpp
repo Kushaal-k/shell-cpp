@@ -7,11 +7,14 @@ int main() {
   std::cerr << std::unitbuf;
 
   // TODO: Uncomment the code below to pass the first stage
-  while(true){
+  std::string command;
+  do{
     std::cout << "$ ";
-    std::string s;
-    std::getline(std::cin, s);
-
-    std::cout << s << ": command not found" << std::endl;
-  }
+    
+    std::getline(std::cin, command);
+    if(command == "exit"){
+      return 0;
+    }
+    std::cout << command << ": command not found" << std::endl;
+  }while(true);
 }
