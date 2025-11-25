@@ -57,7 +57,7 @@ int main() {
 
         if(fs::exists(fullPath)){
           if(access(fullPath.string().c_str(), X_OK) == 0){
-            std::cout << text << " is " << fullPath << std::endl;
+            std::cout << text << " is " << fullPath.string() << std::endl;
             found = true;
             break;
           }
