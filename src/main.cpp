@@ -6,14 +6,20 @@ int main() {
   std::cout << std::unitbuf;
   std::cerr << std::unitbuf;
 
-  // TODO: Uncomment the code below to pass the first stage
   std::string command;
   do{
     std::cout << "$ ";
     
     std::getline(std::cin, command);
+
+    std::string prefix = "echo";
     if(command == "exit"){
       return 0;
+    }
+    else if(command.rfind(prefix, 0) == 0){
+      std::string text = command.substr(5, command.size());
+      std::cout << text << "\n";
+      continue;
     }
     std::cout << command << ": command not found" << std::endl;
   }while(true);
