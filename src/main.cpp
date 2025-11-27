@@ -6,10 +6,12 @@
 #include <filesystem>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
 
 namespace fs = std::filesystem;
+struct stat info;
 
-std::vector<std::string> builtIn = {"echo", "type", "exit","pwd"};
+std::vector<std::string> builtIn = {"echo", "type", "exit", "pwd", "cd"};
 
 bool isBuiltIn(std::vector<std::string>& builtin, std::string target){
   for(auto& item: builtin){
@@ -66,6 +68,14 @@ bool runExec(const std::vector<std::string>& splittedCommand)
     }
     return true;
 }
+
+bool directoryExist(const fs::path& path){
+    if(fs::is_directory(path)){
+        return true;
+    }
+    return false;
+}
+
 
 int main() {
     // Flush after every std::cout / std:cerr
@@ -132,6 +142,25 @@ int main() {
     }
     else if(splittedCommand[0] == "pwd"){
         std::cout << get_current_dir_name() << '\n';
+    }
+    else if(splittedCommand[0] == "cd"){
+        
+        if(splittedCommand.size() > 1)
+        {
+            fs::path file_path = splittedCommand[1];
+
+            if(directoryExist(file_path)){
+                try{
+                    fs::current_path(file_path);
+                }
+                catch(...){
+                    std::cout << "Access Denied" << '\n';
+                }
+            }
+            else{
+                std::cout << "cd: " << splittedCommand[1] <<  ": No such file or directory" << "\n";
+            }
+        }
         continue;
     }
     std::cout << command << ": command not found" << std::endl;
