@@ -9,7 +9,7 @@
 
 namespace fs = std::filesystem;
 
-std::vector<std::string> builtIn = {"echo", "type", "exit"};
+std::vector<std::string> builtIn = {"echo", "type", "exit","pwd"};
 
 bool isBuiltIn(std::vector<std::string>& builtin, std::string target){
   for(auto& item: builtin){
