@@ -82,6 +82,8 @@ int main() {
     std::cout << std::unitbuf;
     std::cerr << std::unitbuf;
 
+   
+
     std::string command;
     while(true){
     std::cout << "$ ";
@@ -92,7 +94,8 @@ int main() {
     std::string temp;
     std::vector<std::string> splittedCommand;
 
-    while(getline(ss, temp, ' ')){
+    while(getline(ss, temp, ' '))
+    {
         if(!temp.empty()){
             splittedCommand.push_back(temp);
         }
@@ -103,10 +106,12 @@ int main() {
     }
 
     //Checking different condition on command
-    if(command == "exit"){
+    if(command == "exit")
+    {
         return 0;
     }
-    else if(splittedCommand[0] == "echo"){
+    else if(splittedCommand[0] == "echo")
+    {
         if(splittedCommand.size()>1){
             for(int i=1;i<splittedCommand.size()-1;i++){
             std::cout << splittedCommand[i] << " ";
@@ -119,7 +124,9 @@ int main() {
         
         continue;
     }
-    else if(splittedCommand[0] == "type"){
+
+    else if(splittedCommand[0] == "type")
+    {
         std::string text = command.substr(5,command.length());
         if(isBuiltIn(builtIn, text)){
             std::cout << text << " is a shell builtin" << '\n';
@@ -135,24 +142,29 @@ int main() {
         }
         continue;
     }
+
     else if(!findExec(splittedCommand[0]).empty())
     {
         if(runExec(splittedCommand))
             continue;
     }
-    else if(splittedCommand[0] == "pwd"){
+
+    else if(splittedCommand[0] == "pwd")
+    {
         std::cout << get_current_dir_name() << '\n';
-        continue;
     }
+
     else if(splittedCommand[0] == "cd"){
         
-        if(splittedCommand.size() > 1)
+        if(splittedCommand.size() > 1) 
         {
-            fs::path file_path = splittedCommand[1];
+            std::string path = splittedCommand[1];
+    
+            fs::path file_path = fs::absolute(fs::path(path));
 
             if(directoryExist(file_path)){
                 try{
-                    fs::current_path(file_path);
+                    fs::current_path(file_path); 
                 }
                 catch(...){
                     std::cout << "Access Denied" << '\n';
