@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <unistd.h>
+#include <sys/wait.h>
 
 namespace fs = std::filesystem;
 
@@ -20,54 +21,115 @@ bool isBuiltIn(std::vector<std::string>& builtin, std::string target){
   return false;
 }
 
-int main() {
-  // Flush after every std::cout / std:cerr
-  std::cout << std::unitbuf;
-  std::cerr << std::unitbuf;
+//Finding Executable File
+std::string foundExec(std::string text){
+  std::string pathEnv = getenv("PATH");
+  std::stringstream ss(pathEnv);
+  std::string dir;
 
-  std::string command;
-  do{
+  while(getline(ss, dir, ':')){
+    fs::path fullPath = fs::path(dir)/text;
+
+    if(fs::exists(fullPath)){
+      if(access(fullPath.string().c_str(), X_OK) == 0){
+        // std::cout << text << " is " << fullPath.string() << std::endl;
+        return fullPath.string();
+        break;
+      }
+    }
+  }
+
+  return "";
+}
+
+// Running Executable File 
+bool runExec(const std::vector<std::string>& splittedCommand)
+{
+    pid_t pid = fork();
+
+    if(pid == 0)
+    {
+        std::vector<char*> args;
+        for(auto& s: splittedCommand){
+            args.push_back(const_cast<char*>(s.c_str()));
+        }
+        args.push_back(nullptr);
+
+        execvp(args[0], args.data());
+
+        std::cout << args[0] << ": command not found\n";
+        exit(1);
+    }
+    else{
+        wait(nullptr);
+        
+    }
+    return true;
+}
+
+int main() {
+    // Flush after every std::cout / std:cerr
+    std::cout << std::unitbuf;
+    std::cerr << std::unitbuf;
+
+    std::string command;
+    while(true){
     std::cout << "$ ";
     
+    //Splitting the command in string vector
     std::getline(std::cin, command);
-    
+    std::stringstream ss(command);
+    std::string temp;
+    std::vector<std::string> splittedCommand;
 
-    if(command == "exit"){
-      return 0;
-    }
-    else if(command.rfind("echo", 0) == 0){
-      std::string text = command.substr(5, command.size());
-      std::cout << text << "\n";
-      continue;
-    }
-    else if(command.rfind("type", 0) == 0){
-      std::string pathEnv = getenv("PATH");
-      std::stringstream ss(pathEnv);
-      std::string dir;
-      bool found = false;
-
-      std::string text = command.substr(5,command.length());
-      if(isBuiltIn(builtIn, text)){
-        std::cout << text << " is a shell builtin" << '\n';
-        continue;
-      }
-
-      while(getline(ss, dir, ':')){
-        fs::path fullPath = fs::path(dir)/text;
-
-        if(fs::exists(fullPath)){
-          if(access(fullPath.string().c_str(), X_OK) == 0){
-            std::cout << text << " is " << fullPath.string() << std::endl;
-            found = true;
-            break;
-          }
+    while(getline(ss, temp, ' ')){
+        if(!temp.empty()){
+            splittedCommand.push_back(temp);
         }
-      }
-      if(!found){
-        std::cout << text << ": not found" << '\n';
-      }
-      continue;
+    }
+
+    if (splittedCommand.empty()) {
+        continue;
+    }
+
+    //Checking different condition on command
+    if(command == "exit"){
+        return 0;
+    }
+    else if(splittedCommand[0] == "echo"){
+        if(splittedCommand.size()>1){
+            for(int i=1;i<splittedCommand.size()-1;i++){
+            std::cout << splittedCommand[i] << " ";
+            }
+            std::cout << splittedCommand[splittedCommand.size()-1] << '\n';
+        }
+        else{
+            std::cout << '\n';
+        }
+        
+        continue;
+    }
+    else if(splittedCommand[0] == "type"){
+        std::string text = command.substr(5,command.length());
+        if(isBuiltIn(builtIn, text)){
+            std::cout << text << " is a shell builtin" << '\n';
+            continue;
+        }
+
+        std::string fullPath = foundExec(text);
+        if(fullPath.empty()){
+            std::cout << text << ": not found" << '\n';
+        }
+        else{
+            std::cout << text << " is " << fullPath << '\n';
+        }
+        continue;
+    }
+    else if(!foundExec(splittedCommand[0]).empty())
+    {
+        if(runExec(splittedCommand))
+            continue;
     }
     std::cout << command << ": command not found" << std::endl;
-  }while(true);
+  }
 }
