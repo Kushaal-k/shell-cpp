@@ -160,7 +160,12 @@ int main() {
         if(splittedCommand.size() > 1) 
         {
             std::string path = splittedCommand[1];
-    
+
+            if(path == "~"){
+                std::string home = getenv("HOME");
+                path = home;
+            }
+            
             fs::path file_path = fs::absolute(fs::path(path));
 
             if(directoryExist(file_path)){
