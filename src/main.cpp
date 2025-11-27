@@ -131,7 +131,8 @@ int main() {
             continue;
     }
     else if(splittedCommand[0] == "pwd"){
-        std::cout << findExec("main.exe") << '\n';
+        std::cout << get_current_dir_name() << '\n';
+        continue;
     }
     std::cout << command << ": command not found" << std::endl;
   }
