@@ -22,7 +22,7 @@ bool isBuiltIn(std::vector<std::string>& builtin, std::string target){
 }
 
 //Finding Executable File
-std::string foundExec(std::string text){
+std::string findExec(std::string text){
   std::string pathEnv = getenv("PATH");
   std::stringstream ss(pathEnv);
   std::string dir;
@@ -116,7 +116,7 @@ int main() {
             continue;
         }
 
-        std::string fullPath = foundExec(text);
+        std::string fullPath = findExec(text);
         if(fullPath.empty()){
             std::cout << text << ": not found" << '\n';
         }
@@ -125,10 +125,13 @@ int main() {
         }
         continue;
     }
-    else if(!foundExec(splittedCommand[0]).empty())
+    else if(!findExec(splittedCommand[0]).empty())
     {
         if(runExec(splittedCommand))
             continue;
+    }
+    else if(splittedCommand[0] == "pwd"){
+        std::cout << findExec("main.exe") << '\n';
     }
     std::cout << command << ": command not found" << std::endl;
   }
