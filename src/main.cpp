@@ -152,6 +152,7 @@ int main() {
     else if(splittedCommand[0] == "pwd")
     {
         std::cout << get_current_dir_name() << '\n';
+        continue;
     }
 
     else if(splittedCommand[0] == "cd"){
