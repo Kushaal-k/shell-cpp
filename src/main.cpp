@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
+#include <fstream>
+#include <algorithm>
 
 namespace fs = std::filesystem;
 struct stat info;
@@ -21,6 +23,21 @@ bool isBuiltIn(std::vector<std::string>& builtin, std::string target){
   }
 
   return false;
+}
+
+void parseCommand(std::string & command, std::vector<std::string>& splittedCommand)
+{
+    command.erase(std::remove(command.begin(), command.end(), '\''), command.end());
+    std::stringstream ss(command);
+    std::string temp;
+
+    while(getline(ss, temp, ' '))
+    {
+        if(!temp.empty()){
+            splittedCommand.push_back(temp);
+        }
+    }
+
 }
 
 //Finding Executable File
@@ -76,6 +93,22 @@ bool directoryExist(const fs::path& path){
     return false;
 }
 
+void readFile(const std::string& path)
+{
+    std::string line;
+    std::ifstream myfile (path);
+
+    if(myfile.is_open()){
+        while( getline(myfile,line)){
+            std::cout << line << '\n';
+        }
+        myfile.close();
+    }
+
+    else{
+        std::cout << "Unable to open file" << '\n';
+    }
+}
 
 int main() {
     // Flush after every std::cout / std:cerr
@@ -83,23 +116,16 @@ int main() {
     std::cerr << std::unitbuf;
 
    
-
     std::string command;
     while(true){
     std::cout << "$ ";
     
     //Splitting the command in string vector
     std::getline(std::cin, command);
-    std::stringstream ss(command);
-    std::string temp;
+    
     std::vector<std::string> splittedCommand;
 
-    while(getline(ss, temp, ' '))
-    {
-        if(!temp.empty()){
-            splittedCommand.push_back(temp);
-        }
-    }
+    parseCommand(command, splittedCommand);
 
     if (splittedCommand.empty()) {
         continue;
@@ -155,7 +181,8 @@ int main() {
         continue;
     }
 
-    else if(splittedCommand[0] == "cd"){
+    else if(splittedCommand[0] == "cd")
+    {
         
         if(splittedCommand.size() > 1) 
         {
@@ -180,6 +207,16 @@ int main() {
                 std::cout << "cd: " << splittedCommand[1] <<  ": No such file or directory" << "\n";
             }
         }
+        continue;
+    }
+    else if(splittedCommand[0] == "cat")
+    {
+        for(int i=1; i<splittedCommand.size(); i++)
+        {
+            readFile(splittedCommand[i]);
+            std::cout << '\n';
+        }
+        std::cout << '\n';
         continue;
     }
     std::cout << command << ": command not found" << std::endl;
