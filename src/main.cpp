@@ -30,35 +30,46 @@ void parseCommand(const std::string& command, std::vector<std::string>& splitted
     bool inQuotes = false;
     bool firstTokenDone = false;
 
-    for (char c : command) {
-        if (!firstTokenDone) {
-            // Build the command name
-            if (std::isspace(c)) {
-                if (!current.empty()) {
+    for (char c : command) 
+    {
+        if (!firstTokenDone) 
+        {
+            if (std::isspace(c)) 
+            {
+                if (!current.empty()) 
+                {
                     splittedCommand.push_back(current);
                     current.clear();
                     firstTokenDone = true;
                 }
-            } else {
+            } 
+            else {
                 current += c;
             }
-        }
+        } 
         else {
-            // Everything after command = single argument
             if (c == '\'') {
                 inQuotes = !inQuotes;
-            } 
+            }
+            else if (std::isspace(c) && !inQuotes) {
+                if (!current.empty() && current.back() != ' ') {
+                    current += ' ';
+                }
+            }
             else {
                 current += c;
             }
         }
     }
 
-    if (!current.empty()) {
+    if (!current.empty()) 
+    {
+        if (!current.empty() && current.back() == ' ')
+            current.pop_back();
+
         splittedCommand.push_back(current);
     }
 }
-
 
 //Finding Executable File
 std::string findExec(std::string text){
