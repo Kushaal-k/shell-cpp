@@ -28,31 +28,37 @@ bool isBuiltIn(std::vector<std::string>& builtin, std::string target){
 void parseCommand(const std::string& command, std::vector<std::string>& splittedCommand) {
     std::string current;
     bool inQuotes = false;
+    bool firstTokenDone = false;
 
     for (char c : command) {
-        if (c == '\'') {
-            inQuotes = !inQuotes;
-            if (!inQuotes) {
-                splittedCommand.push_back(current);
-                current.clear();
-            }
-        }
-        else if (std::isspace(c) && !inQuotes) {
-            if (!current.empty()) {
-                splittedCommand.push_back(current);
-                current.clear();
+        if (!firstTokenDone) {
+            // Build the command name
+            if (std::isspace(c)) {
+                if (!current.empty()) {
+                    splittedCommand.push_back(current);
+                    current.clear();
+                    firstTokenDone = true;
+                }
+            } else {
+                current += c;
             }
         }
         else {
-            current += c;
+            // Everything after command = single argument
+            if (c == '\'') {
+                inQuotes = !inQuotes;
+            } 
+            else {
+                current += c;
+            }
         }
     }
 
     if (!current.empty()) {
         splittedCommand.push_back(current);
     }
-
 }
+
 
 //Finding Executable File
 std::string findExec(std::string text){
