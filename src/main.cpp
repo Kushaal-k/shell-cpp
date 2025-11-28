@@ -25,17 +25,31 @@ bool isBuiltIn(std::vector<std::string>& builtin, std::string target){
   return false;
 }
 
-void parseCommand(std::string & command, std::vector<std::string>& splittedCommand)
-{
-    command.erase(std::remove(command.begin(), command.end(), '\''), command.end());
-    std::stringstream ss(command);
-    std::string temp;
+void parseCommand(const std::string& command, std::vector<std::string>& splittedCommand) {
+    std::string current;
+    bool inQuotes = false;
 
-    while(getline(ss, temp, ' '))
-    {
-        if(!temp.empty()){
-            splittedCommand.push_back(temp);
+    for (char c : command) {
+        if (c == '\'') {
+            inQuotes = !inQuotes;
+            if (!inQuotes) {
+                splittedCommand.push_back(current);
+                current.clear();
+            }
         }
+        else if (std::isspace(c) && !inQuotes) {
+            if (!current.empty()) {
+                splittedCommand.push_back(current);
+                current.clear();
+            }
+        }
+        else {
+            current += c;
+        }
+    }
+
+    if (!current.empty()) {
+        splittedCommand.push_back(current);
     }
 
 }
