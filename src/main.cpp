@@ -28,14 +28,18 @@ bool isBuiltIn(std::vector<std::string>& builtin, std::string target){
 void parseCommand(const std::string& input, std::vector<std::string>& tokens) {
     std::string cur = "";
     bool inQuotes = false;
+    bool indQuotes = false;
 
     for (size_t i = 0; i < input.size(); ++i) {
         char c = input[i];
 
-        if (c == '\'') {
+        if(c== '\"'){
+            indQuotes = !indQuotes;
+        }
+        else if (c == '\'' && !indQuotes) {
             inQuotes = !inQuotes;
         }
-        else if (c == ' ' && !inQuotes) {
+        else if (c == ' ' && !inQuotes && !indQuotes) {
             if (!cur.empty()) {
                 tokens.push_back(cur);
                 cur.clear();
@@ -48,6 +52,11 @@ void parseCommand(const std::string& input, std::vector<std::string>& tokens) {
 
     if (!cur.empty())
         tokens.push_back(cur);
+
+    for(auto i : tokens){
+        std::cout << i << " ";
+    }
+    std::cout << '\n';
 }
 
 
