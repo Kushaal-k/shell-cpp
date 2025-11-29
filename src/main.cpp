@@ -35,6 +35,11 @@ void parseCommand(const std::string& input, std::vector<std::string>& tokens) {
         char c = input[i];
         char cs = (i + 1 < input.size()) ? input[i + 1] : '\0';
 
+        if (c == '\\' && (i + 1 < input.size()) && input[i + 1] == '\n') {
+            i++;           
+            continue;       
+        }   
+
         if (inSingle) {
             if (c == '\'') {
                 inSingle = false;
