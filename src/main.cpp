@@ -28,59 +28,71 @@ bool isBuiltIn(std::vector<std::string>& builtin, std::string target){
 void parseCommand(const std::string& input, std::vector<std::string>& tokens) {
 
     std::string cur = "";
-    bool inQuotes = false;
-    bool indQuotes = false;
+    bool inSingle = false;
+    bool inDouble = false;
 
     for (size_t i = 0; i < input.size(); ++i) {
         char c = input[i];
-        char cs;
-        if(i<input.size()-1)
-            cs = input[i+1];
+        char cs = (i + 1 < input.size()) ? input[i + 1] : '\0';
 
-        if(!indQuotes || !inQuotes)
-        {
-            if(c == '\\' && cs ==' ')
-            {
-                cur += ' ';
-                i++;
+        if (inSingle) {
+            if (c == '\'') {
+                inSingle = false;
+            } else {
+                cur += c;    
             }
-            else if(c == '\\'  && cs == '\''){
-                cur += '\'';
-                i++;
-            }
-            else if(c== '\\' && cs == '\"'){
-                cur += '\"';
-                i++;
-            }
-            else if(c == '\\' && cs == '\\'){
-                cur += '\\';
-                i++;
-            }
-            else if(c=='\\'){
-                continue;
-            }
+            continue;
         }
-        else if(c== '\"'){
-            indQuotes = !indQuotes;
+
+        if (c == '\'' && !inDouble) {
+            inSingle = true;
+            continue;
         }
-        else if (c == '\'' && !indQuotes) {
-            inQuotes = !inQuotes;
+
+        if (c == '"' && !inSingle) {
+            inDouble = !inDouble;
+            continue;
         }
-        else if (c == ' ' && !inQuotes && !indQuotes) {
+
+        if (inDouble) {
+            if (c == '\\') {
+                if (cs == '\\' || cs == '"' || cs == ' ') {
+                    cur += cs;
+                    i++;
+                } else {
+                    cur += c;  
+                }
+            } else {
+                cur += c;
+            }
+            continue;
+        }
+
+        if (c == '\\') {
+            if (cs == ' ' || cs == '\\' || cs == '"' || cs == '\'') {
+                cur += cs;
+                i++;
+            } else {
+                cur += c;
+            }
+            continue;
+        }
+
+        if (c == ' ') {
             if (!cur.empty()) {
                 tokens.push_back(cur);
                 cur.clear();
             }
+            continue;
         }
-        else {
-            cur += c;
-        }
+
+        cur += c;
     }
 
     if (!cur.empty())
         tokens.push_back(cur);
-
 }
+
 
 
 //Finding Executable File
