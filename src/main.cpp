@@ -52,11 +52,6 @@ void parseCommand(const std::string& input, std::vector<std::string>& tokens) {
 
     if (!cur.empty())
         tokens.push_back(cur);
-
-    for(auto i : tokens){
-        std::cout << i << " ";
-    }
-    std::cout << '\n';
 }
 
 
