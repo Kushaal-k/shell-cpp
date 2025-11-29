@@ -54,6 +54,9 @@ void parseCommand(const std::string& input, std::vector<std::string>& tokens) {
             cur += '\\';
             i++;
         }
+        else if(c=='\\'){
+            continue;
+        }
         else if(c== '\"'){
             indQuotes = !indQuotes;
         }
