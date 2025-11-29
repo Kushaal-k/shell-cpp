@@ -37,25 +37,28 @@ void parseCommand(const std::string& input, std::vector<std::string>& tokens) {
         if(i<input.size()-1)
             cs = input[i+1];
 
-        if(c == '\\' && cs ==' ')
+        if(!indQuotes || !inQuotes)
         {
-            cur += ' ';
-            i++;
-        }
-        else if(c == '\\'  && cs == '\''){
-            cur += '\'';
-            i++;
-        }
-        else if(c== '\\' && cs == '\"'){
-            cur += '\"';
-            i++;
-        }
-        else if(c == '\\' && cs == '\\'){
-            cur += '\\';
-            i++;
-        }
-        else if(c=='\\'){
-            continue;
+            if(c == '\\' && cs ==' ')
+            {
+                cur += ' ';
+                i++;
+            }
+            else if(c == '\\'  && cs == '\''){
+                cur += '\'';
+                i++;
+            }
+            else if(c== '\\' && cs == '\"'){
+                cur += '\"';
+                i++;
+            }
+            else if(c == '\\' && cs == '\\'){
+                cur += '\\';
+                i++;
+            }
+            else if(c=='\\'){
+                continue;
+            }
         }
         else if(c== '\"'){
             indQuotes = !indQuotes;
