@@ -25,51 +25,31 @@ bool isBuiltIn(std::vector<std::string>& builtin, std::string target){
   return false;
 }
 
-void parseCommand(const std::string& command, std::vector<std::string>& splittedCommand) {
-    std::string current;
+void parseCommand(const std::string& input, std::vector<std::string>& tokens) {
+    std::string cur = "";
     bool inQuotes = false;
-    bool firstTokenDone = false;
 
-    for (char c : command) 
-    {
-        if (!firstTokenDone) 
-        {
-            if (std::isspace(c)) 
-            {
-                if (!current.empty()) 
-                {
-                    splittedCommand.push_back(current);
-                    current.clear();
-                    firstTokenDone = true;
-                }
-            } 
-            else {
-                current += c;
+    for (size_t i = 0; i < input.size(); ++i) {
+        char c = input[i];
+
+        if (c == '\'') {
+            inQuotes = !inQuotes;
+        }
+        else if (c == ' ' && !inQuotes) {
+            if (!cur.empty()) {
+                tokens.push_back(cur);
+                cur.clear();
             }
-        } 
+        }
         else {
-            if (c == '\'') {
-                inQuotes = !inQuotes;
-            }
-            else if (std::isspace(c) && !inQuotes) {
-                if (!current.empty() && current.back() != ' ') {
-                    current += ' ';
-                }
-            }
-            else {
-                current += c;
-            }
+            cur += c;
         }
     }
 
-    if (!current.empty()) 
-    {
-        if (!current.empty() && current.back() == ' ')
-            current.pop_back();
-
-        splittedCommand.push_back(current);
-    }
+    if (!cur.empty())
+        tokens.push_back(cur);
 }
+
 
 //Finding Executable File
 std::string findExec(std::string text){
@@ -169,16 +149,12 @@ int main() {
     }
     else if(splittedCommand[0] == "echo")
     {
-        if(splittedCommand.size()>1){
-            for(int i=1;i<splittedCommand.size()-1;i++){
-            std::cout << splittedCommand[i] << " ";
-            }
-            std::cout << splittedCommand[splittedCommand.size()-1] << '\n';
+        for (int i = 1; i < splittedCommand.size(); i++) {
+            std::cout << splittedCommand[i];
+            if (i + 1 < splittedCommand.size()) std::cout << " ";
         }
-        else{
-            std::cout << '\n';
-        }
-        
+        std::cout << "\n";
+
         continue;
     }
 
@@ -241,15 +217,12 @@ int main() {
         continue;
     }
     else if(splittedCommand[0] == "cat")
-    {
-        for(int i=1; i<splittedCommand.size(); i++)
-        {
-            readFile(splittedCommand[i]);
-            std::cout << '\n';
-        }
-        std::cout << '\n';
-        continue;
+{
+    for(int i = 1; i < splittedCommand.size(); i++) {
+        readFile(splittedCommand[i]);
     }
+    continue;
+}
     std::cout << command << ": command not found" << std::endl;
   }
 }
