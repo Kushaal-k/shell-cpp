@@ -25,66 +25,77 @@ bool isBuiltIn(std::vector<std::string>& builtin, std::string target){
   return false;
 }
 
-void parseCommand(const std::string& input, std::vector<std::string>& tokens) {
-
-    std::string cur = "";
+void parseCommand(const std::string& input, std::vector<std::string>& tokens)
+{
+    std::string cur;
     bool inSingle = false;
     bool inDouble = false;
 
-    for (size_t i = 0; i < input.size(); ++i) {
-        char c = input[i];
+    for (size_t i = 0; i < input.size(); ++i)
+    {
+        char c  = input[i];
         char cs = (i + 1 < input.size()) ? input[i + 1] : '\0';
 
-        if (c == '\\' && !inSingle && !inDouble) {
-            i++;           
-            continue;       
-        }   
-
-        if (inSingle) {
-            if (c == '\'') {
+        if (inSingle)
+        {
+            if (c == '\'')
+            {
                 inSingle = false;
-            } else {
-                cur += c;    
+            }
+            else
+            {
+                cur += c;
             }
             continue;
         }
 
-        if (c == '\'' && !inDouble) {
+        if (c == '\'' && !inDouble)
+        {
             inSingle = true;
             continue;
         }
 
-        if (c == '"' && !inSingle) {
+        if (c == '"' && !inSingle)
+        {
             inDouble = !inDouble;
             continue;
         }
 
-        if (inDouble) {
-            if (c == '\\') {
-                if (cs == '\\' || cs == '"' || cs == ' ') {
+        if (inDouble)
+        {
+            if (c == '\\')
+            {
+                if (cs == '"' || cs == '\\' || cs == ' ')
+                {
                     cur += cs;
                     i++;
-                } else {
-                    cur += c;  
                 }
-            } else {
+                else
+                {
+                    cur += c;
+                }
+            }
+            else
+            {
                 cur += c;
             }
             continue;
         }
 
-        if (c == '\\') {
-            if (cs == ' ' || cs == '\\' || cs == '"' || cs == '\'') {
+        if (c == '\\')
+        {
+            if (cs != '\0')
+            {
                 cur += cs;
                 i++;
-            } else {
-                cur += c;
             }
             continue;
         }
 
-        if (c == ' ') {
-            if (!cur.empty()) {
+        if (c == ' ')
+        {
+            if (!cur.empty())
+            {
                 tokens.push_back(cur);
                 cur.clear();
             }
